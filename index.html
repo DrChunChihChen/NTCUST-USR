@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>國立臺中科技大學 USR 團隊 | 糯米橋永續之旅 | 旅遊碳足跡計算器</title>
+    <title>國立臺中科技大學 USR 團隊 | 糯米橋永續之旅 | 旅遊碳足跡計算</title>
     
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -56,6 +56,7 @@
             background: linear-gradient(rgba(78, 52, 46, 0.3), rgba(78, 52, 46, 0.3)), url('https://raw.githubusercontent.com/DrChunChihChen/USR_carbon/main/images/img1.png');
             background-size: cover;
             background-position: center;
+            background-repeat: no-repeat;
             color: white;
             padding: 4rem 1.5rem 6rem;
             text-align: center;
@@ -64,6 +65,11 @@
             position: relative;
             overflow: hidden;
             box-shadow: 0 4px 15px rgba(78, 52, 46, 0.15);
+            min-height: 400px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
         }
 
         .hero h1 {
@@ -297,7 +303,6 @@
         .btn-submit {
             width: 100%;
             padding: 1.2rem;
-            /* Gradient using new palette */
             background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
             color: white;
             border: none;
@@ -323,7 +328,6 @@
             text-align: center;
             margin-bottom: 2rem;
             padding: 2rem;
-            /* Cream gradient */
             background: linear-gradient(135deg, #FFFDE7, #FFF8E1);
             border-radius: 1.5rem;
             border: 2px solid var(--accent-color);
@@ -339,7 +343,7 @@
         .badge-title {
             font-size: 1.8rem;
             font-weight: 800;
-            color: #F57F17; /* Darker Orange/Yellow for text */
+            color: #F57F17;
             margin-bottom: 0.5rem;
         }
         
@@ -485,26 +489,50 @@
             border: 1px solid rgba(255,255,255,0.5);
         }
 
-        /* --- Footer --- */
+        /* --- Footer (Updated to fix clipping) --- */
+        .footer-banner-container {
+            width: 100%;
+            margin-top: 2rem;
+            border-top-left-radius: 3rem;
+            border-top-right-radius: 3rem;
+            overflow: hidden;
+            line-height: 0;
+            box-shadow: 0 -4px 15px rgba(78, 52, 46, 0.1);
+        }
+
+        .footer-banner-img {
+            width: 100%;
+            height: auto;
+            display: block;
+            object-fit: cover;
+        }
+
+        /* --- COMPACT FOOTER STYLES --- */
         .site-footer {
             background-color: var(--text-dark);
             color: #EFEBE9;
-            padding: 3rem 1.5rem;
+            /* Reduced padding from 3rem to 1.5rem */
+            padding: 1.5rem 1.5rem; 
             text-align: center;
-            margin-top: 4rem;
-            font-size: 0.9rem;
-            line-height: 1.8;
+            font-size: 0.85rem; /* Slightly smaller font for compact look */
+            line-height: 1.6;
         }
 
         .site-footer p {
-            margin: 0.5rem 0;
+            margin: 0.3rem 0; /* Reduced margin */
+        }
+        
+        /* New: Content wrapper for width control */
+        .footer-content {
+            max-width: 600px; /* Constrain width as requested */
+            margin: 0 auto;
         }
 
         .footer-logo {
-            font-size: 1.2rem;
+            font-size: 1.1rem;
             font-weight: 700;
             color: var(--accent-color);
-            margin-bottom: 1rem;
+            margin-bottom: 0.5rem;
             display: inline-block;
         }
 
@@ -529,7 +557,7 @@
 <body>
 
     <header class="hero">
-        <div class="hero-badge">2025 </div>
+        <div class="hero-badge">2025</div>
         <h1>國立臺中科技大學 USR 團隊</h1>
         <p>永續農遊與觀光創新<br>糯米橋永續之旅</p>
     </header>
@@ -732,6 +760,11 @@
 
         </div>
 
+    </div>
+
+    <!-- Footer Banner Image (Using <img> tag for full display) -->
+    <div class="footer-banner-container">
+        <img src="https://raw.githubusercontent.com/DrChunChihChen/USR_carbon/main/images/img2.png" alt="USR Banner" class="footer-banner-img">
     </div>
 
     <!-- Footer -->
