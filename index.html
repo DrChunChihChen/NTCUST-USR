@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>國立臺中科技大學 USR 團隊 | 糯米橋永續之旅 | 碳足跡計算器 </title>
+    <title>國立臺中科技大學 USR 團隊 | 糯米橋永續之旅 | 旅遊碳足跡計算器</title>
     
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -46,6 +46,9 @@
             color: var(--text-dark);
             line-height: 1.6;
             overflow-x: hidden;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
         }
 
         /* --- Hero Section --- */
@@ -97,6 +100,7 @@
             padding: 0 1.5rem;
             position: relative;
             z-index: 10;
+            flex: 1; /* Push footer down */
         }
 
         /* --- Cards --- */
@@ -481,6 +485,36 @@
             border: 1px solid rgba(255,255,255,0.5);
         }
 
+        /* --- Footer --- */
+        .site-footer {
+            background-color: var(--text-dark);
+            color: #EFEBE9;
+            padding: 3rem 1.5rem;
+            text-align: center;
+            margin-top: 4rem;
+            font-size: 0.9rem;
+            line-height: 1.8;
+        }
+
+        .site-footer p {
+            margin: 0.5rem 0;
+        }
+
+        .footer-logo {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: var(--accent-color);
+            margin-bottom: 1rem;
+            display: inline-block;
+        }
+
+        .footer-divider {
+            display: inline-block;
+            margin: 0 0.5rem;
+            color: var(--text-light);
+            opacity: 0.5;
+        }
+
         /* Hidden Utility */
         .hidden { display: none; }
         .fade-in { animation: fadeIn 0.8s ease forwards; }
@@ -699,6 +733,21 @@
         </div>
 
     </div>
+
+    <!-- Footer -->
+    <footer class="site-footer">
+        <div class="footer-content">
+            <div class="footer-logo">國立臺中科技大學 智慧產業學院</div>
+            <p>地址：臺中市北區三民路三段129號 中正大樓一樓3104A</p>
+            <p>
+                Copyright © 2022 NTCUST College of Intelligence
+                <span class="footer-divider">|</span>
+                Tel：886-4-2219-5600
+                <span class="footer-divider">|</span>
+                Fax：886-4-2219-5609
+            </p>
+        </div>
+    </footer>
 
     <script>
         // --- DATA CONSTANTS ---
