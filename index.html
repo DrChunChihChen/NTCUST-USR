@@ -17,7 +17,7 @@
 
     <style>
         :root {
-            /* --- NEW COLOR PALETTE (Extracted from USR Image) --- */
+            /* --- COLOR PALETTE (Kept Original) --- */
             --primary-color: #6A8D39; /* Warm Olive Green */
             --primary-dark: #4A6328;  /* Darker Olive */
             --primary-light: #EFF5E6; /* Very light green bg */
@@ -212,11 +212,12 @@
             font-weight: 500;
             user-select: none;
             color: var(--text-light);
+            position: relative; /* For tooltip positioning context if needed */
         }
 
         .pill-radio:checked + .pill-label {
             background-color: var(--primary-color);
-            color: white;
+            color: white !important; /* Force white text when checked to override inline styles */
             border-color: var(--primary-color);
             transform: scale(1.05);
             box-shadow: 0 4px 10px rgba(106, 141, 57, 0.3);
@@ -297,6 +298,172 @@
             cursor: pointer;
             font-weight: 600;
             flex-grow: 1;
+        }
+
+        /* --- Waste Slider --- */
+        .waste-slider-container {
+            background: #FFFDE7;
+            padding: 1.5rem;
+            border-radius: 1rem;
+            border: 2px solid var(--accent-color);
+            margin-top: 1rem;
+        }
+
+        .slider-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .slider-header label {
+            font-weight: 700;
+            color: var(--text-dark);
+            font-size: 1.1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .waste-feedback {
+            font-weight: bold;
+            color: var(--primary-dark);
+            background: white;
+            padding: 4px 12px;
+            border-radius: 20px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            font-size: 0.95rem;
+        }
+
+        input[type=range] {
+            -webkit-appearance: none;
+            width: 100%;
+            height: 12px;
+            border-radius: 10px;
+            background: linear-gradient(to right, var(--primary-color), var(--accent-color), #D84315);
+            outline: none;
+            transition: opacity .2s;
+            cursor: pointer;
+        }
+
+        input[type=range]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            background: white;
+            border: 3px solid var(--text-dark);
+            cursor: pointer;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+            transition: transform 0.2s;
+        }
+
+        input[type=range]::-webkit-slider-thumb:hover {
+            transform: scale(1.2);
+        }
+
+        .waste-labels {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 10px;
+            font-size: 0.8rem;
+            color: var(--text-light);
+            font-weight: 600;
+        }
+
+        /* --- TOOLTIP SYSTEM (New Feature) --- */
+        .info-wrapper {
+            position: relative;
+            display: inline-flex;
+            align-items: center;
+            margin-left: 8px;
+            z-index: 50; /* Ensure tooltip is above other elements */
+        }
+
+        .info-icon {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background-color: var(--text-light);
+            color: white;
+            font-size: 12px;
+            font-weight: bold;
+            cursor: help;
+            transition: var(--transition);
+        }
+
+        .info-icon:hover, .info-wrapper.active .info-icon {
+            background-color: var(--accent-color);
+            color: var(--text-dark);
+            transform: scale(1.1);
+        }
+
+        .info-card {
+            visibility: hidden;
+            opacity: 0;
+            position: absolute;
+            bottom: 140%; /* Position above icon */
+            left: 50%;
+            transform: translateX(-50%) translateY(10px);
+            width: 280px;
+            background: white;
+            border: 2px solid var(--accent-color);
+            border-radius: 1rem;
+            padding: 1rem;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+            color: var(--text-dark);
+            text-align: left;
+            font-size: 0.9rem;
+            line-height: 1.5;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            pointer-events: none; /* Prevent tooltip from blocking clicks */
+            z-index: 100;
+        }
+
+        /* Tooltip Arrow */
+        .info-card::after {
+            content: "";
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            margin-left: -8px;
+            border-width: 8px;
+            border-style: solid;
+            border-color: var(--accent-color) transparent transparent transparent;
+        }
+
+        /* Show Tooltip Logic */
+        .info-wrapper:hover .info-card,
+        .info-wrapper.active .info-card {
+            visibility: visible;
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+            pointer-events: auto;
+        }
+
+        /* Tooltip Content Styles */
+        .info-title {
+            font-weight: 800;
+            color: var(--primary-dark);
+            margin-bottom: 0.5rem;
+            font-size: 1rem;
+            border-bottom: 1px dashed #DDD;
+            padding-bottom: 4px;
+        }
+        
+        .info-row { margin-bottom: 0.5rem; }
+        .info-label { font-weight: 700; color: var(--text-light); margin-right: 4px; }
+        .info-highlight { color: #D84315; font-weight: bold; }
+
+        @media (max-width: 768px) {
+            .info-card {
+                width: 240px; /* Slightly narrower on mobile */
+                bottom: 150%;
+            }
         }
 
         /* --- Submit Button --- */
@@ -630,23 +797,214 @@
 
                 <!-- Transport -->
                 <div class="form-group">
-                    <label class="form-label">🚙 移動載具選擇</label>
+                    <label class="form-label">🚙 移動載具選擇 (行)</label>
                     <div class="pills-container">
+                        <!-- Car -->
                         <label>
                             <input type="radio" name="transport" value="car_petrol" class="pill-radio" checked>
-                            <span class="pill-label">🚗 自用小客車</span>
+                            <span class="pill-label">
+                                🚗 自用小客車
+                                <div class="info-wrapper" onclick="toggleTooltip(this, event)">
+                                    <span class="info-icon">❓</span>
+                                    <div class="info-card">
+                                        <div class="info-title">🌿 自用小客車</div>
+                                        <div class="info-row"><span class="info-label">💡為什麼最不環保?</span>每人平均碳排最高,因為車輛重量大、只載少數人。若能多載1人,碳排可立即減半!</div>
+                                        <div class="info-row"><span class="info-label">📊碳排放:</span>約 0.2 kg CO₂/km/人</div>
+                                        <div class="info-row"><span class="info-label">🌳相當於:</span>1小時開車 = 需種1棵樹吸收1年</div>
+                                        <div class="info-row"><span class="info-highlight">✨小提示:</span>試試共乘或選平日出遊避開塞車</div>
+                                    </div>
+                                </div>
+                            </span>
                         </label>
+                        
+                        <!-- Motorcycle -->
                         <label>
                             <input type="radio" name="transport" value="motorcycle" class="pill-radio">
-                            <span class="pill-label">🛵 機車</span>
+                            <span class="pill-label">
+                                🛵 機車
+                                <div class="info-wrapper" onclick="toggleTooltip(this, event)">
+                                    <span class="info-icon">❓</span>
+                                    <div class="info-card">
+                                        <div class="info-title">🌿 機車</div>
+                                        <div class="info-row"><span class="info-label">💡為什麼還可以?</span>比汽車省油,但比大眾運輸耗能。電動機車碳排更低,是不錯的選擇!</div>
+                                        <div class="info-row"><span class="info-label">📊碳排放:</span>約 0.08 kg CO₂/km/人</div>
+                                        <div class="info-row"><span class="info-label">🌳相當於:</span>騎100km ≈ 排放8kg CO₂</div>
+                                        <div class="info-row"><span class="info-highlight">✨小提示:</span>保持穩定速度更省油</div>
+                                    </div>
+                                </div>
+                            </span>
                         </label>
+                        
+                        <!-- Bus -->
                         <label>
                             <input type="radio" name="transport" value="bus" class="pill-radio">
-                            <span class="pill-label" style="border-color:var(--primary-color); color:var(--primary-color);">🚌 客運/公車 (推薦)</span>
+                            <span class="pill-label" style="border-color:var(--primary-color); color:var(--primary-color);">
+                                🚌 客運/公車 (推薦)
+                                <div class="info-wrapper" onclick="toggleTooltip(this, event)">
+                                    <span class="info-icon">❓</span>
+                                    <div class="info-card">
+                                        <div class="info-title">🌿 客運/公車</div>
+                                        <div class="info-row"><span class="info-label">💡為什麼更環保?</span>一台客運載40人,平均每人碳排僅小客車的1/4!人多力量大,就是低碳的秘訣。</div>
+                                        <div class="info-row"><span class="info-label">📊碳排放:</span>約 0.05 kg CO₂/km/人</div>
+                                        <div class="info-row"><span class="info-label">🌳相當於:</span>搭客運100km = 開車25km</div>
+                                        <div class="info-row"><span class="info-highlight">✨小提示:</span>事先買票避免滿班,還能省錢</div>
+                                    </div>
+                                </div>
+                            </span>
                         </label>
+                        
+                        <!-- HSR -->
                         <label>
                             <input type="radio" name="transport" value="high_speed_rail" class="pill-radio">
-                            <span class="pill-label">🚄 高鐵 + 接駁</span>
+                            <span class="pill-label">
+                                🚄 高鐵 + 接駁
+                                <div class="info-wrapper" onclick="toggleTooltip(this, event)">
+                                    <span class="info-icon">❓</span>
+                                    <div class="info-card">
+                                        <div class="info-title">🌿 高鐵+接駁</div>
+                                        <div class="info-row"><span class="info-label">💡為什麼環保?</span>電力驅動比燃油乾淨,台灣電網逐年綠化中。但需考慮接駁交通的碳排喔!</div>
+                                        <div class="info-row"><span class="info-label">📊碳排放:</span>約 0.03 kg CO₂/km/人</div>
+                                        <div class="info-row"><span class="info-label">🌳相當於:</span>北高來回 ≈ 種2棵樹可抵消</div>
+                                        <div class="info-row"><span class="info-highlight">✨小提示:</span>選接駁巴士比搭計程車更環保</div>
+                                    </div>
+                                </div>
+                            </span>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- NEW: Dining Section with Dynamic Slider -->
+                <div class="form-group">
+                    <label class="form-label">🍽️ 旅途飲食習慣 (食)</label>
+                    <div class="pills-container" style="margin-bottom: 1rem;">
+                        <!-- Meat -->
+                        <label>
+                            <input type="radio" name="dining" value="meat_heavy" class="pill-radio">
+                            <span class="pill-label">
+                                🥩 肉食主義
+                                <div class="info-wrapper" onclick="toggleTooltip(this, event)">
+                                    <span class="info-icon">❓</span>
+                                    <div class="info-card">
+                                        <div class="info-title">🌿 肉食主義</div>
+                                        <div class="info-row"><span class="info-label">💡為什麼碳排高?</span>畜牧業佔全球15%溫室氣體!生產1kg牛肉=開車160km的碳排。</div>
+                                        <div class="info-row"><span class="info-label">📊碳排放:</span>每餐約 3-5 kg CO₂</div>
+                                        <div class="info-row"><span class="info-label">🌳相當於:</span>1週3餐牛肉 = 需種10棵樹</div>
+                                        <div class="info-row"><span class="info-highlight">✨小提示:</span>試試「週一無肉日」,從小改變開始</div>
+                                    </div>
+                                </div>
+                            </span>
+                        </label>
+                        
+                        <!-- Balanced -->
+                        <label>
+                            <input type="radio" name="dining" value="balanced" class="pill-radio" checked>
+                            <span class="pill-label">
+                                🍱 均衡飲食
+                                <div class="info-wrapper" onclick="toggleTooltip(this, event)">
+                                    <span class="info-icon">❓</span>
+                                    <div class="info-card">
+                                        <div class="info-title">🌿 均衡飲食</div>
+                                        <div class="info-row"><span class="info-label">💡為什麼較環保?</span>肉類與蔬食均衡,碳排比全肉飲食少50%。台灣本地食材更能減少運輸碳排!</div>
+                                        <div class="info-row"><span class="info-label">📊碳排放:</span>每餐約 1.5-2 kg CO₂</div>
+                                        <div class="info-row"><span class="info-label">🌳相當於:</span>選在地蔬菜 = 減少20%碳排</div>
+                                        <div class="info-row"><span class="info-highlight">✨小提示:</span>選「當季」食材最環保也最美味</div>
+                                    </div>
+                                </div>
+                            </span>
+                        </label>
+                        
+                        <!-- Veggie -->
+                        <label>
+                            <input type="radio" name="dining" value="local_veg" class="pill-radio">
+                            <span class="pill-label" style="border-color:var(--primary-color); color:var(--primary-color);">
+                                🥗 在地低碳蔬食
+                                <div class="info-wrapper" onclick="toggleTooltip(this, event)">
+                                    <span class="info-icon">❓</span>
+                                    <div class="info-card">
+                                        <div class="info-title">🌿 在地低碳蔬食</div>
+                                        <div class="info-row"><span class="info-label">💡為什麼最環保?</span>植物性飲食碳排僅肉類的1/10!選在地食材更避免長途運輸排放。</div>
+                                        <div class="info-row"><span class="info-label">📊碳排放:</span>每餐約 0.5-1 kg CO₂</div>
+                                        <div class="info-row"><span class="info-label">🌳相當於:</span>1週蔬食 = 減少開車50km</div>
+                                        <div class="info-row"><span class="info-highlight">✨小提示:</span>台灣有機小農市集超讚,試試看!</div>
+                                    </div>
+                                </div>
+                            </span>
+                        </label>
+                    </div>
+                    
+                    <!-- NEW: FUN SLIDER for Food Waste -->
+                    <div class="waste-slider-container">
+                        <div class="slider-header">
+                            <label>🗑️ 剩食評估：您預計每餐剩下多少？</label>
+                            <div class="waste-feedback" id="waste-feedback">😋 光盤行動大師！ (0%)</div>
+                        </div>
+                        <input type="range" id="waste-slider" min="0" max="100" step="10" value="0" oninput="updateWasteFeedback(this.value)">
+                        <div class="waste-labels">
+                            <span>0% (吃光光)</span>
+                            <span>30%</span>
+                            <span>50%</span>
+                            <span>80%</span>
+                            <span>100% (沒吃?)</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- NEW: Accommodation Section -->
+                <div class="form-group">
+                    <label class="form-label">🏨 住宿方式規劃 (宿)</label>
+                    <div class="pills-container">
+                        <!-- Hotel -->
+                        <label>
+                            <input type="radio" name="accommodation" value="hotel" class="pill-radio" checked>
+                            <span class="pill-label">
+                                🏢 一般飯店
+                                <div class="info-wrapper" onclick="toggleTooltip(this, event)">
+                                    <span class="info-icon">❓</span>
+                                    <div class="info-card">
+                                        <div class="info-title">🌿 一般飯店</div>
+                                        <div class="info-row"><span class="info-label">💡為什麼碳排較高?</span>24H空調、每日換洗床單、自助早餐剩食...大型飯店能源消耗驚人。</div>
+                                        <div class="info-row"><span class="info-label">📊碳排放:</span>每晚約 20-30 kg CO₂</div>
+                                        <div class="info-row"><span class="info-label">🌳相當於:</span>住1晚 = 開車150km</div>
+                                        <div class="info-row"><span class="info-highlight">✨小提示:</span>掛「不需清潔」牌子,減少資源浪費</div>
+                                    </div>
+                                </div>
+                            </span>
+                        </label>
+                        
+                        <!-- Green Hotel -->
+                        <label>
+                            <input type="radio" name="accommodation" value="green_hotel" class="pill-radio">
+                            <span class="pill-label">
+                                🌿 環保旅店
+                                <div class="info-wrapper" onclick="toggleTooltip(this, event)">
+                                    <span class="info-icon">❓</span>
+                                    <div class="info-card">
+                                        <div class="info-title">🌿 環保旅店</div>
+                                        <div class="info-row"><span class="info-label">💡為什麼更環保?</span>使用綠建築設計、再生能源、減廢措施。通常有環保標章認證可參考!</div>
+                                        <div class="info-row"><span class="info-label">📊碳排放:</span>每晚約 8-15 kg CO₂</div>
+                                        <div class="info-row"><span class="info-label">🌳相當於:</span>比一般飯店減少50%碳排</div>
+                                        <div class="info-row"><span class="info-highlight">✨小提示:</span>自備盥洗用品更加分</div>
+                                    </div>
+                                </div>
+                            </span>
+                        </label>
+                        
+                        <!-- Camping -->
+                        <label>
+                            <input type="radio" name="accommodation" value="camping" class="pill-radio">
+                            <span class="pill-label">
+                                ⛺ 民宿 / 露營
+                                <div class="info-wrapper" onclick="toggleTooltip(this, event)">
+                                    <span class="info-icon">❓</span>
+                                    <div class="info-card">
+                                        <div class="info-title">🌿 民宿/露營</div>
+                                        <div class="info-row"><span class="info-label">💡為什麼低碳?</span>小規模經營,較少使用大型空調設備。露營更接近自然,碳足跡最小!</div>
+                                        <div class="info-row"><span class="info-label">📊碳排放:</span>每晚約 5-10 kg CO₂</div>
+                                        <div class="info-row"><span class="info-label">🌳相當於:</span>露營1晚 ≈ 騎機車20km</div>
+                                        <div class="info-row"><span class="info-highlight">✨小提示:</span>使用環保帳篷、攜帶可重複餐具</div>
+                                    </div>
+                                </div>
+                            </span>
                         </label>
                     </div>
                 </div>
@@ -668,12 +1026,6 @@
                             <label for="eco-packaging" class="toggle-label">🎁 伴手禮選簡約包裝</label>
                         </div>
                     </div>
-                </div>
-
-                <!-- Dining & Coffee Hidden Logic for Simplicity -->
-                <div style="display:none;">
-                    <input type="radio" name="dining" value="local_meat" checked>
-                    <input type="radio" name="coffee" value="black_coffee" checked>
                 </div>
 
                 <button type="button" class="btn-submit" onclick="runChallenge()">
@@ -783,19 +1135,32 @@
     </footer>
 
     <script>
-        // --- DATA CONSTANTS ---
+        // --- DATA CONSTANTS (Enhanced for Detail) ---
         const EMISSION_FACTORS = {
             transport: {
                 car_petrol: 0.115, motorcycle: 0.0951,
                 high_speed_rail: 0.032, bus: 0.04
             },
+            dining: {
+                meat_heavy: 6.5,   
+                balanced: 3.8,     
+                local_veg: 1.2     
+            },
+            // Food Waste: 0.056kg waste ~ 0.115 kgCO2e
+            // We use 0.056 as a benchmark for ~10% waste. 
+            // So 100% waste ~ 0.56kg waste * 2.06 factor ~ 1.15 kgCO2e/person/day
+            food_waste_max: 1.15, 
+
+            accommodation: {
+                hotel: 12.0,       
+                green_hotel: 6.5,  
+                camping: 2.0       
+            },
             lifestyle: {
                 disposable_cup: 0.11,
                 hotel_amenities: 0.3,
                 souvenir_pkg: 0.05
-            },
-            dining_avg: 2.0, // Simplified avg
-            coffee_avg: 0.5
+            }
         };
 
         const CITY_DISTANCES = {
@@ -807,35 +1172,105 @@
         let potentialSavings = 0;
         let chartInstances = {};
 
+        // --- TOOLTIP LOGIC FOR MOBILE ---
+        function toggleTooltip(element, event) {
+            // Prevent the click from triggering the radio button
+            event.preventDefault();
+            event.stopPropagation();
+
+            // Check if already active
+            const isActive = element.classList.contains('active');
+
+            // Close all other tooltips
+            document.querySelectorAll('.info-wrapper').forEach(el => el.classList.remove('active'));
+
+            // Toggle current one
+            if (!isActive) {
+                element.classList.add('active');
+            }
+        }
+
+        // Close tooltip when clicking outside
+        document.addEventListener('click', function(event) {
+            if (!event.target.closest('.info-wrapper')) {
+                document.querySelectorAll('.info-wrapper').forEach(el => el.classList.remove('active'));
+            }
+        });
+
+        // --- SLIDER LOGIC ---
+        function updateWasteFeedback(val) {
+            const feedback = document.getElementById('waste-feedback');
+            const percent = parseInt(val);
+            if (percent === 0) {
+                feedback.innerHTML = "😋 光盤行動大師！ (0%)";
+                feedback.style.color = "#33691E";
+            } else if (percent <= 30) {
+                feedback.innerHTML = "🙂 還可以，但有點可惜 (30%)";
+                feedback.style.color = "#F57F17";
+            } else if (percent <= 50) {
+                feedback.innerHTML = "😟 剩一半了... (50%)";
+                feedback.style.color = "#E65100";
+            } else if (percent <= 80) {
+                feedback.innerHTML = "😱 太多了吧！ (80%)";
+                feedback.style.color = "#B71C1C";
+            } else {
+                feedback.innerHTML = "😭 暴殄天物啊！ (100%)";
+                feedback.style.color = "#B71C1C";
+            }
+        }
+
         // --- MAIN FUNCTION ---
         function runChallenge() {
             // 1. Get Inputs
             const travelers = parseInt(document.getElementById('traveler-count').value);
             const city = document.getElementById('departure-city').value;
             const transportKey = document.querySelector('input[name="transport"]:checked').value;
+            
+            const diningKey = document.querySelector('input[name="dining"]:checked').value;
+            
+            // Get Slider Value (0-100)
+            const wastePercent = parseInt(document.getElementById('waste-slider').value);
+            
+            const accomKey = document.querySelector('input[name="accommodation"]:checked').value;
             const byoCup = document.getElementById('byo-cup').checked;
             const byoToiletries = document.getElementById('byo-toiletries').checked;
             const ecoPkg = document.getElementById('eco-packaging').checked;
             const routeKey = document.querySelector('input[name="route"]:checked').value;
 
             // 2. Calculate Base Emissions
+            // Transport
             const dist = CITY_DISTANCES[city];
             const transEmit = dist * EMISSION_FACTORS.transport[transportKey] * travelers;
-            const routeEmit = 30 * EMISSION_FACTORS.transport[transportKey] * travelers; // Avg internal route
-            const foodEmit = (EMISSION_FACTORS.dining_avg + EMISSION_FACTORS.coffee_avg) * travelers;
+            const routeEmit = 30 * EMISSION_FACTORS.transport[transportKey] * travelers; 
             
-            // Lifestyle Savings (What they already selected)
+            // Food
+            let foodEmit = EMISSION_FACTORS.dining[diningKey] * travelers;
+            
+            // Food Waste Calculation (Scaled by slider)
+            // 0% -> 0 emission added (Bonus!)
+            // 10% -> Normal waste (0.056kg equiv)
+            // 100% -> Max waste
+            const wasteEmission = (wastePercent / 100) * EMISSION_FACTORS.food_waste_max * travelers;
+            foodEmit += wasteEmission;
+
+            // Accommodation
+            const rooms = Math.ceil(travelers / 2);
+            const accomEmit = EMISSION_FACTORS.accommodation[accomKey] * rooms;
+            
+            // Lifestyle Savings
             let currentSaved = 0;
             if (byoCup) currentSaved += (EMISSION_FACTORS.lifestyle.disposable_cup * travelers);
             if (byoToiletries) currentSaved += (EMISSION_FACTORS.lifestyle.hotel_amenities * travelers);
-            if (ecoPkg) currentSaved += (EMISSION_FACTORS.lifestyle.souvenir_pkg * travelers * 2); // Assume 2 gifts
+            if (ecoPkg) currentSaved += (EMISSION_FACTORS.lifestyle.souvenir_pkg * travelers * 2);
+            
+            // Bonus saving for Clean Plate (0%)
+            if (wastePercent === 0) currentSaved += (EMISSION_FACTORS.food_waste_max * 0.1 * travelers); // Small bonus
 
-            // Calculate "Lifestyle Cost" (if they didn't select) to show in chart
             let lifestyleEmit = 0;
             if (!byoCup) lifestyleEmit += (EMISSION_FACTORS.lifestyle.disposable_cup * travelers);
             if (!byoToiletries) lifestyleEmit += (EMISSION_FACTORS.lifestyle.hotel_amenities * travelers);
 
-            const total = transEmit + routeEmit + foodEmit + lifestyleEmit;
+            const total = transEmit + routeEmit + foodEmit + accomEmit + lifestyleEmit;
             currentTotal = total;
 
             // 3. UI Updates
@@ -849,69 +1284,83 @@
             animateValue("saved-co2", 0, currentSaved, 1000);
 
             // Trees
-            const treeCount = total / 0.06; // 1 tree absorbs 0.06kg/day
+            const treeCount = total / 12; 
             document.getElementById('tree-count').innerText = treeCount.toFixed(1);
             renderTrees(treeCount);
 
             // Badge System
             assignBadge(total / travelers);
 
-            // Generate Pledges (What they DIDN'T do)
-            generatePledges(transportKey, byoCup, byoToiletries, travelers);
+            // Generate Pledges
+            generatePledges(transportKey, diningKey, wastePercent, byoCup, byoToiletries, travelers);
 
             // Charts
-            renderCharts(transEmit + routeEmit, foodEmit, lifestyleEmit, total);
+            renderCharts(transEmit + routeEmit, foodEmit, accomEmit, lifestyleEmit, total);
 
-            // Confetti if good score (Low carbon transport)
-            if (transportKey === 'bus' || transportKey === 'high_speed_rail') {
-                launchConfetti();
+            // Confetti if good score
+            if (wastePercent === 0) {
+                launchConfetti(); // Bonus confetti for clean plate
             }
         }
 
-        // --- BADGE LOGIC (Gamification) ---
+        // --- BADGE LOGIC ---
         function assignBadge(perPerson) {
             const icon = document.getElementById('badge-icon');
             const title = document.getElementById('badge-title');
             const desc = document.getElementById('badge-desc');
             const container = document.querySelector('.badge-container');
 
-            // Thresholds based on typical data
-            if (perPerson < 15) {
+            if (perPerson < 22) {
                 icon.innerText = "👑";
                 title.innerText = "榮譽稱號：淨零碳排守護者";
                 desc.innerText = "太神了！您的碳足跡極低，是地球的超級英雄！";
                 container.style.background = "linear-gradient(135deg, #DCEDC8, #F1F8E9)";
                 title.style.color = "#33691E";
-                launchConfetti(); // Extra confetti
-            } else if (perPerson < 40) {
+                launchConfetti(); 
+            } else if (perPerson < 50) {
                 icon.innerText = "🌿";
                 title.innerText = "榮譽稱號：永續綠色旅人";
-                desc.innerText = "表現很棒！您已經掌握了低碳旅遊的精髓。";
+                desc.innerText = "表現很棒！您已經掌握了食衣住行低碳的精髓。";
                 container.style.background = "linear-gradient(135deg, #FFF9C4, #FFFDE7)";
                 title.style.color = "#F57F17";
             } else {
                 icon.innerText = "🌱";
                 title.innerText = "榮譽稱號：環保實習生";
-                desc.innerText = "還有進步空間喔！試著搭乘大眾運輸或減少一次性用品。";
+                desc.innerText = "還有進步空間喔！試著調整飲食、減少剩食。";
             }
         }
 
-        // --- PLEDGE LOGIC (Interactive) ---
-        function generatePledges(transport, byoCup, byoToiletries, travelers) {
+        // --- PLEDGE LOGIC ---
+        function generatePledges(transport, dining, wastePercent, byoCup, byoToiletries, travelers) {
             const container = document.getElementById('pledge-container');
             container.innerHTML = "";
             let pledges = [];
 
-            // 1. Transport Pledge (if drove car)
             if (transport === 'car_petrol') {
                 pledges.push({
                     text: "下次挑戰搭乘客運/公車",
-                    save: 20 * travelers, // Rough estimate saving
+                    save: 20 * travelers, 
                     id: "pledge-bus"
                 });
             }
 
-            // 2. Cup Pledge (if didn't bring)
+            if (dining === 'meat_heavy') {
+                pledges.push({
+                    text: "嘗試一餐在地蔬食料理",
+                    save: (EMISSION_FACTORS.dining.meat_heavy - EMISSION_FACTORS.dining.local_veg) * travelers,
+                    id: "pledge-food"
+                });
+            }
+
+            // Waste Pledge
+            if (wastePercent > 10) {
+                pledges.push({
+                    text: "承諾下次點餐適量，挑戰光盤",
+                    save: (wastePercent / 100) * EMISSION_FACTORS.food_waste_max * travelers,
+                    id: "pledge-waste"
+                });
+            }
+
             if (!byoCup) {
                 pledges.push({
                     text: "下次一定會帶環保杯",
@@ -920,7 +1369,6 @@
                 });
             }
 
-            // 3. Hotel Pledge (if didn't bring)
             if (!byoToiletries) {
                 pledges.push({
                     text: "下次會自備盥洗用具",
@@ -929,18 +1377,15 @@
                 });
             }
 
-            // 4. Generic Pledges
-            pledges.push({ text: "用餐時選擇在地蔬食", save: 2.0 * travelers, id: "pledge-veg" });
             pledges.push({ text: "離開房間隨手關燈/冷氣", save: 0.5 * travelers, id: "pledge-energy" });
 
-            // Render
             pledges.forEach(p => {
                 const div = document.createElement('div');
                 div.className = 'pledge-card';
                 div.innerHTML = `
                     <div class="pledge-check">✔</div>
                     <div class="pledge-text">${p.text}</div>
-                    <div class="pledge-impact">- ${p.save.toFixed(1)} kg</div>
+                    <div class="pledge-impact">- ${p.save.toFixed(3)} kg</div>
                 `;
                 div.onclick = () => togglePledge(div, p.save);
                 container.appendChild(div);
@@ -955,19 +1400,19 @@
             } else {
                 potentialSavings -= amount;
             }
-            document.getElementById('extra-savings').innerText = potentialSavings.toFixed(1);
+            document.getElementById('extra-savings').innerText = potentialSavings.toFixed(3);
         }
 
         // --- VISUALS ---
         function renderTrees(count) {
             const grid = document.getElementById('tree-grid');
             grid.innerHTML = "";
-            const num = Math.min(Math.floor(count / 10), 12); // Max 12 emojis
+            const num = Math.min(Math.floor(count / 2), 12); 
             if (num === 0) grid.innerHTML = "🌱";
             for(let i=0; i<num; i++) {
                 grid.innerHTML += "🌳";
             }
-            if(count > 120) grid.innerHTML += " +";
+            if(count > 24) grid.innerHTML += " +";
         }
 
         function launchConfetti() {
@@ -996,18 +1441,17 @@
             }());
         }
 
-        function renderCharts(transport, food, lifestyle, total) {
+        function renderCharts(transport, food, accom, lifestyle, total) {
             const ctx1 = document.getElementById('breakdownChart').getContext('2d');
             if(chartInstances.breakdown) chartInstances.breakdown.destroy();
             
-            // Updated Colors to Match Palette
             chartInstances.breakdown = new Chart(ctx1, {
                 type: 'doughnut',
                 data: {
-                    labels: ['交通', '飲食', '生活耗材'],
+                    labels: ['交通', '飲食(含剩食)', '住宿', '耗材'],
                     datasets: [{
-                        data: [transport, food, lifestyle],
-                        backgroundColor: ['#6A8D39', '#F4C430', '#795548'],
+                        data: [transport, food, accom, lifestyle],
+                        backgroundColor: ['#6A8D39', '#F4C430', '#8D6E63', '#A1887F'],
                         borderWidth: 0
                     }]
                 }
@@ -1016,7 +1460,7 @@
             const ctx2 = document.getElementById('comparisonChart').getContext('2d');
             if(chartInstances.comparison) chartInstances.comparison.destroy();
 
-            const avg = total * 1.8; // Simulated average
+            const avg = total * 1.5; 
             chartInstances.comparison = new Chart(ctx2, {
                 type: 'bar',
                 data: {
